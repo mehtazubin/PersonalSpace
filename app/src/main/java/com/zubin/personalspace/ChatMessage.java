@@ -8,6 +8,7 @@ public class ChatMessage {
     private String messageText;
     private String messageUser;
     private long messageTime;
+    private boolean notified;
 
     public ChatMessage(String messageText, String messageUser) {
         this.messageText = messageText;
@@ -15,11 +16,16 @@ public class ChatMessage {
 
         // Initialize to current time
         messageTime = new Date().getTime();
+        this.notified = false;
     }
 
     public ChatMessage(){
 
     }
+
+    public boolean getNotified() {return notified;}
+
+    public void setNotified(boolean notified) {this.notified = notified;}
 
     public String getMessageText() {
         return messageText;

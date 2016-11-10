@@ -21,7 +21,11 @@ import android.widget.TextView;
 
 import com.firebase.ui.database.FirebaseListAdapter;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import static android.content.Context.NOTIFICATION_SERVICE;
 
@@ -32,6 +36,7 @@ import static android.content.Context.NOTIFICATION_SERVICE;
 public class ChatFragment extends Fragment {
     private FirebaseListAdapter<ChatMessage> adapter;
     private EditText input;
+    private int start = 0;
 
 
     @Override
@@ -57,8 +62,19 @@ public class ChatFragment extends Fragment {
                                         .getCurrentUser()
                                         .getDisplayName())
                         );
+            }
+        });
 
+        final FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference ref = database.getReference();
+        ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
                 displayChatMessages(view);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
             }
         });
 
@@ -80,19 +96,11 @@ public class ChatFragment extends Fragment {
                 // Set their text
                 messageText.setText(model.getMessageText());
                 messageUser.setText(model.getMessageUser());
-                NotificationCompat.Builder mBuilder =
-                        new NotificationCompat.Builder(getContext())
-                                .setSmallIcon(R.drawable.ic_chat)
-                                .setContentTitle(model.getMessageUser())
-                                .setContentText(model.getMessageText());
+
 
                 // Format the date before showing it
                 messageTime.setText(DateFormat.format("dd-MM-yyyy (HH:mm:ss)",
                         model.getMessageTime()));
-                NotificationManager mNotifyMgr;
-                mNotifyMgr = (NotificationManager) mActivity.getSystemService(NOTIFICATION_SERVICE);
-
-                mNotifyMgr.notify(001, mBuilder.build());
             }
         };
 
