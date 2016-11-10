@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "433699003630",
+    "firebase_url": "https://personalspace-f22b2.firebaseio.com",
+    "project_id": "personalspace-f22b2",
+    "storage_bucket": "personalspace-f22b2.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:433699003630:android:f3fa5196e97b8268",
+        "android_client_info": {
+          "package_name": "com.zubin.personalspace"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "433699003630-m47r1k2miqc6oe98jq8m9rbjj0a1s2o4.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.zubin.personalspace",
+            "certificate_hash": "33C6F1D01F86E06F4D562A6D706E66D52A7D3565"
+          }
+        },
+        {
+          "client_id": "433699003630-av9cnnm8eqmaj51b4tpgp91vovqpcpt2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBzOXEqffK2wMW2pwc-ulDZV8Rols8tSxQ"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "433699003630-av9cnnm8eqmaj51b4tpgp91vovqpcpt2.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
