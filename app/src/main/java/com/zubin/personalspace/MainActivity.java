@@ -32,10 +32,12 @@ public class MainActivity extends AppCompatActivity
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
     private static final int SIGN_IN_REQUEST_CODE = 0;
+    private Intent notiService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        notiService = new Intent(this.getBaseContext(), FireBaseService.class);
         handleAuthentication();
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -58,6 +60,13 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        String menu = getIntent().getStringExtra("menu");
+
+        // If menuFragment is defined, then this activity was launched with a fragment selection
+        if (menu != null) {
+            onNavigationItemSelected(navigationView.getMenu().getItem(0).setChecked(true));
+
+        }
     }
 
     private void handleAuthentication() {
@@ -96,11 +105,13 @@ public class MainActivity extends AppCompatActivity
 
         if(requestCode == SIGN_IN_REQUEST_CODE) {
             if(resultCode == RESULT_OK) {
+                startService(notiService);
                 Toast.makeText(this,
                         "Successfully signed in. Welcome!",
                         Toast.LENGTH_LONG)
                         .show();
             } else {
+                stopService(notiService);
                 Toast.makeText(this,
                         "We couldn't sign you in. Please try again later.",
                         Toast.LENGTH_LONG)
@@ -146,6 +157,7 @@ public class MainActivity extends AppCompatActivity
                     .addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
+                            stopService(notiService);
                             Toast.makeText(MainActivity.this,
                                     "You have been signed out.",
                                     Toast.LENGTH_LONG)
