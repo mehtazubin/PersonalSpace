@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+
 class FireBaseListAdapterMultiLayout extends BaseAdapter {
 
     private Query mRef;

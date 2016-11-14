@@ -6,6 +6,8 @@ import android.database.DataSetObserver;
 import android.media.Image;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.text.format.DateFormat;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -33,8 +35,10 @@ import static android.content.Context.NOTIFICATION_SERVICE;
  * Created by zubin on 11/9/2016.
  */
 
+
 public class ChatFragment extends Fragment {
-    private FireBaseListAdapterMultiLayout adapter;
+    private FirebaseRecyclerAdapterMultiLayout adapter;
+    //private FireBaseListAdapterMultiLayout adapter;
     private EditText input;
 
 
@@ -82,9 +86,12 @@ public class ChatFragment extends Fragment {
 
     public void displayChatMessages(final View view){
 
-        ListView listOfMessages = (ListView) view.findViewById(R.id.messages);
-        adapter = new FireBaseListAdapterMultiLayout (getActivity(), R.layout.message_left,
-                R.layout.message_right, FirebaseDatabase.getInstance().getReference());
-        listOfMessages.setAdapter(adapter);
+        RecyclerView recycler = (RecyclerView) view.findViewById(R.id.messages);
+        recycler.setHasFixedSize(true);
+        LinearLayoutManager manager = new LinearLayoutManager(getActivity());
+        manager.setStackFromEnd(true);
+        recycler.setLayoutManager(manager);
+        adapter = new FirebaseRecyclerAdapterMultiLayout(R.layout.message_right, R.layout.message_left, FirebaseDatabase.getInstance().getReference());
+        recycler.setAdapter(adapter);
     }
 }
