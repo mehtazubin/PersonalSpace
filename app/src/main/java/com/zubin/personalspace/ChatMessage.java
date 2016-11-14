@@ -1,6 +1,8 @@
 package com.zubin.personalspace;
 
 
+import android.widget.TextView;
+
 import java.util.Date;
 
 public class ChatMessage {
@@ -9,6 +11,9 @@ public class ChatMessage {
     private String messageUser;
     private long messageTime;
     private boolean notified;
+    static class ChatMessageViewHolder{
+        TextView messageText;
+    }
 
     public ChatMessage(String messageText, String messageUser) {
         this.messageText = messageText;
