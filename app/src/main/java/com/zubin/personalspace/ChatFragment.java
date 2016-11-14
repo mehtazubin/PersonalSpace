@@ -6,6 +6,8 @@ import android.database.DataSetObserver;
 import android.media.Image;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.text.format.DateFormat;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -33,10 +35,11 @@ import static android.content.Context.NOTIFICATION_SERVICE;
  * Created by zubin on 11/9/2016.
  */
 
+
 public class ChatFragment extends Fragment {
-    private FirebaseListAdapter<ChatMessage> adapter;
+    private FirebaseRecyclerAdapterMultiLayout adapter;
+    //private FireBaseListAdapterMultiLayout adapter;
     private EditText input;
-    private int start = 0;
 
 
     @Override
@@ -82,28 +85,13 @@ public class ChatFragment extends Fragment {
     }
 
     public void displayChatMessages(final View view){
-        ListView listOfMessages = (ListView) view.findViewById(R.id.messages);
 
-        adapter = new FirebaseListAdapter<ChatMessage>(getActivity(), ChatMessage.class,
-                R.layout.message, FirebaseDatabase.getInstance().getReference()) {
-            @Override
-            protected void populateView(View v, ChatMessage model, int position) {
-                // Get references to the views of message.xml
-                TextView messageText = (TextView)v.findViewById(R.id.message_text);
-                TextView messageUser = (TextView)v.findViewById(R.id.message_user);
-                TextView messageTime = (TextView)v.findViewById(R.id.message_time);
-
-                // Set their text
-                messageText.setText(model.getMessageText());
-                messageUser.setText(model.getMessageUser());
-
-
-                // Format the date before showing it
-                messageTime.setText(DateFormat.format("dd-MM-yyyy (HH:mm:ss)",
-                        model.getMessageTime()));
-            }
-        };
-
-        listOfMessages.setAdapter(adapter);
+        RecyclerView recycler = (RecyclerView) view.findViewById(R.id.messages);
+        recycler.setHasFixedSize(true);
+        LinearLayoutManager manager = new LinearLayoutManager(getActivity());
+        manager.setStackFromEnd(true);
+        recycler.setLayoutManager(manager);
+        adapter = new FirebaseRecyclerAdapterMultiLayout(R.layout.message_right, R.layout.message_left, FirebaseDatabase.getInstance().getReference());
+        recycler.setAdapter(adapter);
     }
 }
