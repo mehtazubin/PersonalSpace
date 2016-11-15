@@ -70,6 +70,9 @@ public class MainActivity extends AppCompatActivity
             onNavigationItemSelected(navigationView.getMenu().getItem(0).setChecked(true));
 
         }
+        else{
+            onNavigationItemSelected(navigationView.getMenu().getItem(0).setChecked(true));
+        }
     }
 
     @Override
