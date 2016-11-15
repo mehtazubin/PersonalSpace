@@ -60,15 +60,18 @@ public class FirebaseRecyclerAdapterMultiLayout extends RecyclerView.Adapter<Fir
     FirebaseArray mSnapshots;
     public class ChatMessageViewHolder extends RecyclerView.ViewHolder{
         TextView messageText;
+        TextView messageUser;
         int layout;
         public ChatMessageViewHolder(View view, int layout){
             super(view);
             this.layout = layout;
             if(this.layout == R.layout.message_left){
                 messageText = (TextView) view.findViewById(R.id.message_left_text);
+                messageUser = (TextView) view.findViewById(R.id.message_left_user);
             }
             else{
                 messageText = (TextView) view.findViewById(R.id.message_right_text);
+                messageUser = (TextView) view.findViewById(R.id.message_right_user);
             }
         }
     }
@@ -204,6 +207,7 @@ public class FirebaseRecyclerAdapterMultiLayout extends RecyclerView.Adapter<Fir
      */
      protected void populateViewHolder(ChatMessageViewHolder viewHolder, ChatMessage model, int position){
          viewHolder.messageText.setText(model.getMessageText());
+         viewHolder.messageUser.setText(model.getMessageUser());
 
 
      }

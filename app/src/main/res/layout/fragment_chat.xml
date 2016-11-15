@@ -8,9 +8,12 @@
         android:layout_width="fill_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:background="#FFF"
+        android:background="#F5F5F5"
         android:divider="@null"
-        android:transcriptMode="alwaysScroll">
+        android:scrollbars="vertical"
+        android:fadeScrollbars="true"
+        android:scrollbarSize="5dp"
+        android:scrollbarThumbVertical="@drawable/scroll_bar">
 
     </android.support.v7.widget.RecyclerView>
     <ImageView
@@ -29,6 +32,7 @@
             android:paddingLeft="4dp"
             android:hint="New Message"
             android:layout_weight="7"
+            android:background="@android:color/transparent"
             android:id="@+id/input" />
 
         <ImageButton
