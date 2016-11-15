@@ -84,6 +84,7 @@ public class ChatFragment extends Fragment {
         return view;
     }
 
+
     public void displayChatMessages(final View view){
 
         RecyclerView recycler = (RecyclerView) view.findViewById(R.id.messages);

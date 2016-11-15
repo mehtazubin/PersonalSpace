@@ -1,5 +1,6 @@
 package com.zubin.personalspace;
 
+import android.app.NotificationManager;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -33,11 +34,13 @@ public class MainActivity extends AppCompatActivity
     private FirebaseAuth.AuthStateListener mAuthListener;
     private static final int SIGN_IN_REQUEST_CODE = 0;
     private Intent notiService;
+    protected static boolean isVisible = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        notiService = new Intent(this.getBaseContext(), FireBaseService.class);
+        notiService = new Intent(this.getBaseContext(), FirebaseService.class);
+        clearNotification();
         handleAuthentication();
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -69,6 +72,22 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        isVisible = true;
+        setVisible(true);
+        clearNotification();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        isVisible = false;
+        setVisible(false);
+    }
+
+
     private void handleAuthentication() {
         if(FirebaseAuth.getInstance().getCurrentUser() == null) {
             // Start sign in/sign up activity
@@ -88,6 +107,7 @@ public class MainActivity extends AppCompatActivity
         } else {
             // User is already signed in. Therefore, display
             // a welcome Toast
+            startService(notiService);
             Toast.makeText(this,
                     "Welcome " + FirebaseAuth.getInstance()
                             .getCurrentUser()
@@ -203,5 +223,10 @@ public class MainActivity extends AppCompatActivity
             fab.hide();
         }
         return true;
+    }
+
+    public void clearNotification(){
+        NotificationManager noti = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        noti.cancel(001);
     }
 }
