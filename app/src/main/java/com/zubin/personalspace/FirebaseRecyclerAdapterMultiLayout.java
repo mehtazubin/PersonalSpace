@@ -6,6 +6,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -57,6 +59,9 @@ public class FirebaseRecyclerAdapterMultiLayout extends RecyclerView.Adapter<Fir
 
     protected int mModelLayoutLeft;
     protected  int mModelLayoutRight;
+    protected String mUser;
+    protected  boolean right;
+    private int lastPosition = -1;
     FirebaseArray mSnapshots;
     public class ChatMessageViewHolder extends RecyclerView.ViewHolder{
         TextView messageText;
@@ -66,22 +71,26 @@ public class FirebaseRecyclerAdapterMultiLayout extends RecyclerView.Adapter<Fir
             super(view);
             this.layout = layout;
             if(this.layout == R.layout.message_left){
+                right = false;
                 messageText = (TextView) view.findViewById(R.id.message_left_text);
                 messageUser = (TextView) view.findViewById(R.id.message_left_user);
             }
             else{
+                right = true;
                 messageText = (TextView) view.findViewById(R.id.message_right_text);
                 messageUser = (TextView) view.findViewById(R.id.message_right_user);
             }
         }
     }
 
-    FirebaseRecyclerAdapterMultiLayout(
+    FirebaseRecyclerAdapterMultiLayout(String user,
                             int modelLayoutRight, int modelLayoutLeft,
                             FirebaseArray snapshots) {
         mModelLayoutRight = modelLayoutRight;
         mModelLayoutLeft = modelLayoutLeft;
+        mUser = user;
         mSnapshots = snapshots;
+        this.setHasStableIds(true);
 
         mSnapshots.setOnChangedListener(new FirebaseArray.OnChangedListener() {
             @Override
@@ -108,6 +117,7 @@ public class FirebaseRecyclerAdapterMultiLayout extends RecyclerView.Adapter<Fir
             public void onCancelled(DatabaseError databaseError) {
                 FirebaseRecyclerAdapterMultiLayout.this.onCancelled(databaseError);
             }
+
         });
     }
 
@@ -119,10 +129,10 @@ public class FirebaseRecyclerAdapterMultiLayout extends RecyclerView.Adapter<Fir
      * @param ref             The Firebase location to watch for data changes. Can also be a slice of a location, using some
      *                        combination of {@code limit()}, {@code startAt()}, and {@code endAt()}.
      */
-    public FirebaseRecyclerAdapterMultiLayout(
+    public FirebaseRecyclerAdapterMultiLayout(String user,
                                    int modelLayoutRight, int modelLayoutLeft,
                                    Query ref) {
-        this(modelLayoutRight, modelLayoutLeft, new FirebaseArray(ref));
+        this(user, modelLayoutRight, modelLayoutLeft, new FirebaseArray(ref));
     }
 
     public void cleanup() {
@@ -169,10 +179,8 @@ public class FirebaseRecyclerAdapterMultiLayout extends RecyclerView.Adapter<Fir
     public void onBindViewHolder(ChatMessageViewHolder viewHolder, int position) {
         ChatMessage model = getItem(position);
         populateViewHolder(viewHolder, model, position);
+        setAnimation(viewHolder.itemView.getRootView(), model, position);
     }
-
-
-
 
     @Override
     public int getItemViewType(int position) {
@@ -183,6 +191,7 @@ public class FirebaseRecyclerAdapterMultiLayout extends RecyclerView.Adapter<Fir
             return mModelLayoutLeft;
         }
     }
+
 
     /**
      * This method will be triggered in the event that this listener either failed at the server,
@@ -205,10 +214,29 @@ public class FirebaseRecyclerAdapterMultiLayout extends RecyclerView.Adapter<Fir
      * @param model      The object containing the data used to populate the view
      * @param position   The position in the list of the view being populated
      */
-     protected void populateViewHolder(ChatMessageViewHolder viewHolder, ChatMessage model, int position){
+    protected void populateViewHolder(ChatMessageViewHolder viewHolder, ChatMessage model, int position){
          viewHolder.messageText.setText(model.getMessageText());
          viewHolder.messageUser.setText(model.getMessageUser());
-
-
+         viewHolder.itemView.clearAnimation();
      }
+    public int getLastPosition(){
+        return lastPosition;
+    }
+    private void setAnimation(View viewToAnimate, ChatMessage model, int position)
+    {
+        // If the bound view wasn't previously displayed on screen, it's animated
+        if (position > lastPosition)
+        {
+            lastPosition = position;
+            Animation animation;
+            if(mUser == model.getMessageUser() || right ) {
+                animation = AnimationUtils.loadAnimation(viewToAnimate.getContext(), R.anim.slide_in_right);
+            }
+            else {
+                animation = AnimationUtils.loadAnimation(viewToAnimate.getContext(), R.anim.slide_in_left);
+            }
+            viewToAnimate.startAnimation(animation);
+            lastPosition = position;
+        }
+    }
 }
