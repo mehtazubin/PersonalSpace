@@ -67,11 +67,9 @@ public class MainActivity extends AppCompatActivity
 
         // If menuFragment is defined, then this activity was launched with a fragment selection
         if (menu != null) {
-            onNavigationItemSelected(navigationView.getMenu().getItem(0).setChecked(true));
-
-        }
-        else{
-            onNavigationItemSelected(navigationView.getMenu().getItem(0).setChecked(true));
+            navigationView.getMenu().getItem(0).setChecked(true);
+            onNavigationItemSelected(navigationView.getMenu().getItem(0));
+            fab.hide();
         }
     }
 
@@ -202,12 +200,15 @@ public class MainActivity extends AppCompatActivity
         Fragment fragment = null;
         Class fragmentClass = null;
         String title = "Personal Space";
-        boolean fabShow = true;
 
         if (id == R.id.nav_chat) {
             fragmentClass = ChatFragment.class;
             title = "Chat";
-            fabShow = false;
+        }
+
+        if(id == R.id.nav_calendar) {
+            fragmentClass = CalendarFragment.class;
+            title = "Calendar";
         }
         try {
             fragment = (Fragment) fragmentClass.newInstance();
@@ -219,12 +220,6 @@ public class MainActivity extends AppCompatActivity
         getSupportActionBar().setTitle(title);
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        if (fabShow) {
-            fab.show();
-        } else {
-            fab.hide();
-        }
         return true;
     }
 

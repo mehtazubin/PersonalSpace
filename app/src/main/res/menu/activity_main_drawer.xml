@@ -6,6 +6,11 @@
             android:id="@+id/nav_chat"
             android:icon="@drawable/ic_chat"
             android:title="Chat" />
+        <item
+            android:id="@+id/nav_calendar"
+            android:icon="@drawable/logo_googleg_color_18dp"
+            android:title="Calendar"
+        />
 
     </group>
 
