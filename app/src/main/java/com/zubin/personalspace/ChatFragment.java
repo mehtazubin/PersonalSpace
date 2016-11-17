@@ -2,11 +2,14 @@ package com.zubin.personalspace;
 
 import android.app.Fragment;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SimpleItemAnimator;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.EditText;
 import android.widget.ImageButton;
 
@@ -32,6 +35,10 @@ public class ChatFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.fragment_chat, container, false);
+        FloatingActionButton fab = (FloatingActionButton) container.getRootView().findViewById(R.id.fab);
+        fab.hide();
+        final RecyclerView recycler = (RecyclerView) view.findViewById(R.id.messages);
+        displayChatMessages(recycler);
         ImageButton send =
                 (ImageButton) view.findViewById(R.id.send);
 
@@ -62,7 +69,7 @@ public class ChatFragment extends Fragment {
         ref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                displayChatMessages(view);
+                scrollBottom(recycler);
             }
 
             @Override
@@ -74,14 +81,22 @@ public class ChatFragment extends Fragment {
     }
 
 
-    public void displayChatMessages(final View view){
+    public void displayChatMessages(RecyclerView recycler){
 
-        RecyclerView recycler = (RecyclerView) view.findViewById(R.id.messages);
+        RecyclerView.ItemAnimator animator = recycler.getItemAnimator();
         recycler.setHasFixedSize(true);
         LinearLayoutManager manager = new LinearLayoutManager(getActivity());
         manager.setStackFromEnd(true);
         recycler.setLayoutManager(manager);
-        adapter = new FirebaseRecyclerAdapterMultiLayout(R.layout.message_right, R.layout.message_left, FirebaseDatabase.getInstance().getReference());
+        adapter = new FirebaseRecyclerAdapterMultiLayout(
+                FirebaseAuth.getInstance().getCurrentUser().getDisplayName(),
+                R.layout.message_right,
+                R.layout.message_left,
+                FirebaseDatabase.getInstance().getReference());
         recycler.setAdapter(adapter);
+    }
+
+    public void scrollBottom(RecyclerView recycler){
+        recycler.scrollBy(0,500);
     }
 }
