@@ -35,6 +35,7 @@ public class MainActivity extends AppCompatActivity
     private static final int SIGN_IN_REQUEST_CODE = 0;
     private Intent notiService;
     protected static boolean isVisible = false;
+    protected static boolean chat = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +68,11 @@ public class MainActivity extends AppCompatActivity
 
         // If menuFragment is defined, then this activity was launched with a fragment selection
         if (menu != null) {
+            navigationView.getMenu().getItem(0).setChecked(true);
+            onNavigationItemSelected(navigationView.getMenu().getItem(0));
+            fab.hide();
+        }
+        else{
             navigationView.getMenu().getItem(0).setChecked(true);
             onNavigationItemSelected(navigationView.getMenu().getItem(0));
             fab.hide();
@@ -204,11 +210,13 @@ public class MainActivity extends AppCompatActivity
         if (id == R.id.nav_chat) {
             fragmentClass = ChatFragment.class;
             title = "Chat";
+            chat = true;
         }
 
         if(id == R.id.nav_calendar) {
             fragmentClass = CalendarFragment.class;
             title = "Calendar";
+            chat = false;
         }
         try {
             fragment = (Fragment) fragmentClass.newInstance();

@@ -32,9 +32,11 @@ public class ChatFragment extends Fragment {
     private EditText input;
 
 
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.fragment_chat, container, false);
+        MainActivity.chat = true;
         FloatingActionButton fab = (FloatingActionButton) container.getRootView().findViewById(R.id.fab);
         fab.hide();
         final RecyclerView recycler = (RecyclerView) view.findViewById(R.id.messages);

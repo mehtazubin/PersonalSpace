@@ -29,7 +29,6 @@ public class FirebaseService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        Log.i("DATACHANGED", "FIRSTINSTANCE");
         final FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference ref = database.getReference();
 
@@ -89,8 +88,12 @@ public class FirebaseService extends Service {
                         noti.flags = Notification.DEFAULT_LIGHTS | Notification.FLAG_AUTO_CANCEL;
                         mNotifyMgr.notify(001, noti);
                         Vibrator v = (Vibrator) getApplication().getSystemService(Context.VIBRATOR_SERVICE);
-                        v.vibrate(500);
+                        v.vibrate(300);
                         child.getRef().child("notified").setValue(true);
+                    }
+                    else if(MainActivity.isVisible && !MainActivity.chat){
+                        Vibrator v = (Vibrator) getApplication().getSystemService(Context.VIBRATOR_SERVICE);
+                        v.vibrate(300);
                     }
                 }
             }
