@@ -24,6 +24,8 @@ import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.Arrays;
 
@@ -32,6 +34,8 @@ public class MainActivity extends AppCompatActivity
 
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
+    protected static String curUid;
+    protected static String curUser;
     private static final int SIGN_IN_REQUEST_CODE = 0;
     private Intent notiService;
     protected static boolean isVisible = false;
@@ -71,7 +75,11 @@ public class MainActivity extends AppCompatActivity
             onNavigationItemSelected(navigationView.getMenu().getItem(0));
             fab.hide();
         }
+        else{
+            onNavigationItemSelected(navigationView.getMenu().getItem(1));
+        }
     }
+
 
     @Override
     public void onResume() {
@@ -131,6 +139,16 @@ public class MainActivity extends AppCompatActivity
                         "Successfully signed in. Welcome!",
                         Toast.LENGTH_LONG)
                         .show();
+                String user = FirebaseAuth.getInstance().getCurrentUser().getDisplayName();
+                String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                curUid = uid;
+                curUser = user;
+
+                FirebaseDatabase database = FirebaseDatabase.getInstance();
+                DatabaseReference ref = database.getReference();
+                if(ref.child("User").child(uid) != null) {
+                    ref.child("User").child(uid).setValue(new Contact(uid, user));
+                }
             } else {
                 stopService(notiService);
                 Toast.makeText(this,
@@ -201,14 +219,17 @@ public class MainActivity extends AppCompatActivity
         Class fragmentClass = null;
         String title = "Personal Space";
 
-        if (id == R.id.nav_chat) {
-            fragmentClass = ChatFragment.class;
-            title = "Chat";
-        }
 
         if(id == R.id.nav_calendar) {
+            isVisible = false;
             fragmentClass = CalendarFragment.class;
             title = "Calendar";
+        }
+
+        if(id == R.id.nav_contact) {
+            isVisible = false;
+            fragmentClass = ContactsFragment.class;
+            title = "Contacts";
         }
         try {
             fragment = (Fragment) fragmentClass.newInstance();
@@ -226,5 +247,30 @@ public class MainActivity extends AppCompatActivity
     public void clearNotification(){
         NotificationManager noti = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         noti.cancel(001);
+    }
+
+    public String getCurUid(){
+        return curUid;
+    }
+
+    public String getCurUser() {
+        return curUser;
+    }
+
+    public void setCurUid(String uid){
+        curUid = uid;
+    }
+
+    public void setCurUser(String user){
+        curUser = user;
+    }
+
+    public void setTitle(String title){
+        getSupportActionBar().setTitle(title);
+    }
+
+    public void setNavChecked(int item) {
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.getMenu().getItem(item).setChecked(true);
     }
 }

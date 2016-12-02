@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/contacts_list"
+        android:layout_width="fill_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="#F5F5F5"
+        android:divider="@null"
+        android:scrollbars="vertical"
+        android:fadeScrollbars="true"
+        android:scrollbarSize="5dp"
+        android:scrollbarThumbVertical="@drawable/scroll_bar">
+    </android.support.v7.widget.RecyclerView>
+
+</LinearLayout>

@@ -20,7 +20,8 @@
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
-            android:weightSum="2"
+            android:minWidth="150dp"
+            android:weightSum="4"
             android:orientation="vertical"
             android:background="@drawable/bubble_right">
             <TextView
@@ -28,14 +29,26 @@
                 android:layout_height="wrap_content"
                 android:textColor="#000"
                 android:textSize="18dp"
-                android:layout_weight="1"
+                android:layout_weight="3"
                 android:id="@+id/message_right_text"/>
-            <TextView
-                android:layout_width="wrap_content"
+            <RelativeLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="bottom|end"
-                android:layout_weight="1"
-                android:id="@+id/message_right_user"/>
+                android:layout_weight="1">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_alignParentLeft="true"
+                    android:textSize="10dp"
+                    android:id="@+id/timestamp_right_user"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:textSize="10dp"
+                    android:id="@+id/message_right_user"/>
+
+            </RelativeLayout>
         </LinearLayout>
     </RelativeLayout>
         

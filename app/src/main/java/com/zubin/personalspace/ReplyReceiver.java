@@ -20,16 +20,19 @@ public class ReplyReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         Bundle remoteInput = RemoteInput.getResultsFromIntent(intent);
+
         if (remoteInput != null) {
 
             String id = remoteInput.getString(FirebaseService.KEY_NOTIFICATION_REPLY);
             FirebaseDatabase.getInstance()
                     .getReference()
+                    .child("Messages")
                     .push()
                     .setValue(new ChatMessage(id,
                             FirebaseAuth.getInstance()
                                     .getCurrentUser()
-                                    .getDisplayName())
+                                    .getDisplayName(),
+                            FirebaseService.curUid, FirebaseService.Uid)
                     );
 
             NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context);

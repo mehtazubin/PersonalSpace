@@ -5,13 +5,18 @@
         <item
             android:id="@+id/nav_chat"
             android:icon="@drawable/ic_chat"
-            android:title="Chat" />
+            android:title="Chat"
+            android:visible="false"/>
+        <item
+            android:id="@+id/nav_contact"
+            android:icon="@drawable/com_facebook_button_icon"
+            android:title="Contacts"
+            />
         <item
             android:id="@+id/nav_calendar"
             android:icon="@drawable/logo_googleg_color_18dp"
             android:title="Calendar"
-        />
-
+            />
     </group>
 
 </menu>

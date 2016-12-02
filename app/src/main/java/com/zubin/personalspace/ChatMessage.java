@@ -9,15 +9,17 @@ public class ChatMessage {
 
     private String messageText;
     private String messageUser;
+    private String recepientUid;
+    private String senderUid;
     private long messageTime;
     private boolean notified;
-    static class ChatMessageViewHolder{
-        TextView messageText;
-    }
 
-    public ChatMessage(String messageText, String messageUser) {
+
+    public ChatMessage(String messageText, String messageUser, String recepientUid, String senderUid) {
         this.messageText = messageText;
         this.messageUser = messageUser;
+        this.senderUid = senderUid;
+        this.recepientUid = recepientUid;
 
         // Initialize to current time
         messageTime = new Date().getTime();
@@ -25,7 +27,6 @@ public class ChatMessage {
     }
 
     public ChatMessage(){
-
     }
 
     public boolean getNotified() {return notified;}
@@ -55,4 +56,13 @@ public class ChatMessage {
     public void setMessageTime(long messageTime) {
         this.messageTime = messageTime;
     }
+
+    public String getRecepientUid() {
+        return this.recepientUid;
+    }
+
+    public String getSenderUid() {
+        return this.senderUid;
+    }
+
 }

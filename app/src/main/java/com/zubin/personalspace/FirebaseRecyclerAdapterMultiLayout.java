@@ -17,6 +17,11 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.Query;
 
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+
 /**
  * This class is a generic way of backing an RecyclerView with a Firebase location.
  * It handles all of the child events at the given Firebase location. It marshals received data into the given
@@ -57,15 +62,18 @@ import com.google.firebase.database.Query;
 public class FirebaseRecyclerAdapterMultiLayout extends RecyclerView.Adapter<FirebaseRecyclerAdapterMultiLayout.ChatMessageViewHolder> {
     private static final String TAG = FirebaseRecyclerAdapterMultiLayout.class.getSimpleName();
 
+    protected  int empty_list_item = R.layout.empty_list_item;
     protected int mModelLayoutLeft;
     protected  int mModelLayoutRight;
-    protected String mUser;
     protected  boolean right;
     private int lastPosition = -1;
+    protected String myUid;
+    protected String curUid;
     FirebaseArray mSnapshots;
     public class ChatMessageViewHolder extends RecyclerView.ViewHolder{
         TextView messageText;
         TextView messageUser;
+        TextView messageTime;
         int layout;
         public ChatMessageViewHolder(View view, int layout){
             super(view);
@@ -74,21 +82,24 @@ public class FirebaseRecyclerAdapterMultiLayout extends RecyclerView.Adapter<Fir
                 right = false;
                 messageText = (TextView) view.findViewById(R.id.message_left_text);
                 messageUser = (TextView) view.findViewById(R.id.message_left_user);
+                messageTime = (TextView) view.findViewById(R.id.timestamp_left_user);
             }
             else{
                 right = true;
                 messageText = (TextView) view.findViewById(R.id.message_right_text);
                 messageUser = (TextView) view.findViewById(R.id.message_right_user);
+                messageTime = (TextView) view.findViewById(R.id.timestamp_right_user);
             }
         }
     }
 
-    FirebaseRecyclerAdapterMultiLayout(String user,
+    FirebaseRecyclerAdapterMultiLayout(String myUid, String curUid,
                             int modelLayoutRight, int modelLayoutLeft,
                             FirebaseArray snapshots) {
         mModelLayoutRight = modelLayoutRight;
         mModelLayoutLeft = modelLayoutLeft;
-        mUser = user;
+        this.myUid = myUid;
+        this.curUid = curUid;
         mSnapshots = snapshots;
         this.setHasStableIds(true);
 
@@ -129,10 +140,10 @@ public class FirebaseRecyclerAdapterMultiLayout extends RecyclerView.Adapter<Fir
      * @param ref             The Firebase location to watch for data changes. Can also be a slice of a location, using some
      *                        combination of {@code limit()}, {@code startAt()}, and {@code endAt()}.
      */
-    public FirebaseRecyclerAdapterMultiLayout(String user,
+    public FirebaseRecyclerAdapterMultiLayout(String myUid, String curUid,
                                    int modelLayoutRight, int modelLayoutLeft,
                                    Query ref) {
-        this(user, modelLayoutRight, modelLayoutLeft, new FirebaseArray(ref));
+        this(myUid, curUid, modelLayoutRight, modelLayoutLeft, new FirebaseArray(ref));
     }
 
     public void cleanup() {
@@ -171,8 +182,13 @@ public class FirebaseRecyclerAdapterMultiLayout extends RecyclerView.Adapter<Fir
 
     @Override
     public ChatMessageViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+
         View view = LayoutInflater.from(parent.getContext()).inflate(viewType, parent, false);
-        return new ChatMessageViewHolder(view, viewType);
+        ChatMessageViewHolder vh = new ChatMessageViewHolder(view, viewType);
+        if(viewType == empty_list_item){
+            vh.itemView.setVisibility(View.GONE);
+        }
+        return vh;
     }
 
     @Override
@@ -184,12 +200,18 @@ public class FirebaseRecyclerAdapterMultiLayout extends RecyclerView.Adapter<Fir
 
     @Override
     public int getItemViewType(int position) {
-        if(FirebaseAuth.getInstance().getCurrentUser().getDisplayName().equalsIgnoreCase(getItem(position).getMessageUser())){
-            return mModelLayoutRight;
-        }
-        else{
-            return mModelLayoutLeft;
-        }
+        try {
+            if (FirebaseAuth.getInstance().getCurrentUser().getUid().equals(getItem(position).getSenderUid()) &&
+                    MainActivity.curUid.equals(getItem(position).getRecepientUid())) {
+                return mModelLayoutRight;
+            } else if (FirebaseAuth.getInstance().getCurrentUser().getUid().equals(getItem(position).getRecepientUid()) &&
+                    MainActivity.curUid.equals(getItem(position).getSenderUid())) {
+                return mModelLayoutLeft;
+            } else {
+                return empty_list_item;
+            }
+        } catch (Exception e){};
+        return empty_list_item;
     }
 
 
@@ -215,13 +237,19 @@ public class FirebaseRecyclerAdapterMultiLayout extends RecyclerView.Adapter<Fir
      * @param position   The position in the list of the view being populated
      */
     protected void populateViewHolder(ChatMessageViewHolder viewHolder, ChatMessage model, int position){
-         viewHolder.messageText.setText(model.getMessageText());
-         viewHolder.messageUser.setText(model.getMessageUser());
-         viewHolder.itemView.clearAnimation();
+        try{
+            viewHolder.messageText.setText(model.getMessageText());
+            viewHolder.messageUser.setText(model.getMessageUser());
+            Date date = new Date(model.getMessageTime());
+            DateFormat formatter = new SimpleDateFormat("h:mm a");
+            String dateFormatted = formatter.format(date);
+            viewHolder.messageTime.setText(dateFormatted);
+            viewHolder.itemView.clearAnimation();
+        } catch (Exception e){
+
+        }
      }
-    public int getLastPosition(){
-        return lastPosition;
-    }
+
     private void setAnimation(View viewToAnimate, ChatMessage model, int position)
     {
         // If the bound view wasn't previously displayed on screen, it's animated
@@ -229,7 +257,7 @@ public class FirebaseRecyclerAdapterMultiLayout extends RecyclerView.Adapter<Fir
         {
             lastPosition = position;
             Animation animation;
-            if(mUser == model.getMessageUser() || right ) {
+            if(myUid == model.getSenderUid() || right ) {
                 animation = AnimationUtils.loadAnimation(viewToAnimate.getContext(), R.anim.slide_in_right);
             }
             else {

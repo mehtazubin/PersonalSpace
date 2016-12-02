@@ -25,13 +25,14 @@ import com.google.firebase.database.ValueEventListener;
 
 public class FirebaseService extends Service {
     public static final String KEY_NOTIFICATION_REPLY = "KEY_NOTIFICATION_REPLY";
+    public static String Uid;
+    public static String curUid;
 
     @Override
     public void onCreate() {
         super.onCreate();
-        Log.i("DATACHANGED", "FIRSTINSTANCE");
         final FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference ref = database.getReference();
+        DatabaseReference ref = database.getReference().child("Messages");
 
         ref.addValueEventListener(new ValueEventListener() {
             @Override
@@ -39,59 +40,72 @@ public class FirebaseService extends Service {
 
                 for (DataSnapshot child : dataSnapshot.getChildren()) {
                     ChatMessage message = child.getValue(ChatMessage.class);
-                    if(!message.getMessageUser().equalsIgnoreCase(FirebaseAuth.getInstance()
-                            .getCurrentUser().getDisplayName())
-                            && !MainActivity.isVisible
-                            && !message.getNotified()) {
-                        Intent resultIntent = new Intent(getApplicationContext(), MainActivity.class);
-                        resultIntent.putExtra("menu", "Chat");
-                        PendingIntent resultPendingIntent = null;
-                        PendingIntent detailsPendingIntent =
-                                PendingIntent.getActivity(
-                                        getApplicationContext(),
+                    try {
+                        if (message.getRecepientUid().equals(FirebaseAuth.getInstance()
+                                .getCurrentUser().getUid())
+                                && !MainActivity.isVisible
+                                && !message.getNotified()) {
+                            FirebaseDatabase.getInstance().getReference()
+                                    .child("User")
+                                    .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                                    .child("last").setValue(message.getMessageUser());
+                            FirebaseDatabase.getInstance().getReference()
+                                    .child("User")
+                                    .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                                    .child("lastUid").setValue(message.getSenderUid());
+                            Intent resultIntent = new Intent(getApplicationContext(), MainActivity.class);
+                            resultIntent.putExtra("menu", "Chat");
+                            PendingIntent resultPendingIntent = null;
+                            PendingIntent detailsPendingIntent =
+                                    PendingIntent.getActivity(
+                                            getApplicationContext(),
+                                            0,
+                                            resultIntent,
+                                            PendingIntent.FLAG_UPDATE_CURRENT
+                                    );
+                            if (Build.VERSION.SDK_INT < 24) {
+                                resultPendingIntent = detailsPendingIntent;
+                            } else {
+                                resultIntent = new Intent(FirebaseService.this, ReplyReceiver.class);
+                                resultIntent.putExtra("user", message.getMessageUser());
+                                resultIntent.putExtra("content", message.getMessageText());
+                                Uid = message.getRecepientUid();
+                                curUid = message.getSenderUid();
+
+                                resultIntent.putExtra("muid", message.getRecepientUid());
+                                resultPendingIntent = PendingIntent.getBroadcast(
+                                        FirebaseService.this,
                                         0,
                                         resultIntent,
-                                        PendingIntent.FLAG_UPDATE_CURRENT
-                                );
-                        if(Build.VERSION.SDK_INT < 24){
-                            resultPendingIntent = detailsPendingIntent;
-                        }
-                        else{
-                            resultIntent = new Intent(FirebaseService.this, ReplyReceiver.class);
-                            resultIntent.putExtra("user", message.getMessageUser());
-                            resultIntent.putExtra("content", message.getMessageText());
-                            resultPendingIntent = PendingIntent.getBroadcast(
-                                    FirebaseService.this,
-                                    0,
-                                    resultIntent,
-                                    PendingIntent.FLAG_UPDATE_CURRENT);
-                        }
+                                        PendingIntent.FLAG_UPDATE_CURRENT);
+                            }
 
-                        RemoteInput remoteInput = new RemoteInput.Builder(KEY_NOTIFICATION_REPLY)
-                                .setLabel("Reply")
-                                .build();
-                        NotificationCompat.Action replyAction = new NotificationCompat.Action.Builder(
-                                android.R.drawable.ic_menu_save, "Reply", resultPendingIntent)
-                                .addRemoteInput(remoteInput)
-                                .build();
-                        NotificationCompat.Builder mBuilder =
-                                new NotificationCompat.Builder(getApplicationContext())
-                                        .setSmallIcon(R.drawable.ic_chat)
-                                        .setColor(getResources().getColor(R.color.colorPrimaryDark, getTheme()))
-                                        .setContentTitle(message.getMessageUser())
-                                        .setContentText(message.getMessageText())
-                                        .setContentIntent(detailsPendingIntent)
-                                        .addAction(replyAction);
+                            RemoteInput remoteInput = new RemoteInput.Builder(KEY_NOTIFICATION_REPLY)
+                                    .setLabel("Reply")
+                                    .build();
+                            NotificationCompat.Action replyAction = new NotificationCompat.Action.Builder(
+                                    android.R.drawable.ic_menu_save, "Reply", resultPendingIntent)
+                                    .addRemoteInput(remoteInput)
+                                    .build();
+                            NotificationCompat.Builder mBuilder =
+                                    new NotificationCompat.Builder(getApplicationContext())
+                                            .setSmallIcon(R.drawable.ic_chat)
+                                            .setColor(getResources().getColor(R.color.colorPrimaryDark, getTheme()))
+                                            .setContentTitle(message.getMessageUser())
+                                            .setContentText(message.getMessageText())
+                                            .setContentIntent(detailsPendingIntent)
+                                            .addAction(replyAction);
 
-                        NotificationManager mNotifyMgr;
-                        mNotifyMgr = (NotificationManager) getApplication().getSystemService(NOTIFICATION_SERVICE);
-                        Notification noti = mBuilder.build();
-                        noti.flags = Notification.DEFAULT_LIGHTS | Notification.FLAG_AUTO_CANCEL;
-                        mNotifyMgr.notify(001, noti);
-                        Vibrator v = (Vibrator) getApplication().getSystemService(Context.VIBRATOR_SERVICE);
-                        v.vibrate(500);
-                        child.getRef().child("notified").setValue(true);
-                    }
+                            NotificationManager mNotifyMgr;
+                            mNotifyMgr = (NotificationManager) getApplication().getSystemService(NOTIFICATION_SERVICE);
+                            Notification noti = mBuilder.build();
+                            noti.flags = Notification.DEFAULT_LIGHTS | Notification.FLAG_AUTO_CANCEL;
+                            mNotifyMgr.notify(001, noti);
+                            Vibrator v = (Vibrator) getApplication().getSystemService(Context.VIBRATOR_SERVICE);
+                            v.vibrate(500);
+                            child.getRef().child("notified").setValue(true);
+                        }
+                    } catch(Exception e){};
                 }
             }
 
